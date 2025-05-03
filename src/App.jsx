@@ -5,10 +5,9 @@ import PuzzlePiece from "./components/PuzzlePiece";
 import DropSlot from "./components/DropSlot";
 import ThreeDModel from "./components/ThreeDModel";
 import ChatBot from "./components/ChatBot";
-import SecondPage from "./components/SecondPage"; // Import the SecondPage component
+import SecondPage from "./components/SecondPage";
 import confetti from "canvas-confetti";
 
-/* --- constants identical to your working code --- */
 const COLS = 3, ROWS = 2, PIECE = 100, GAP = 10;
 const OFFSET_X = 100, OFFSET_Y = 100;
 const FULL_IMAGE = "/images/full-image.jfif";
@@ -34,7 +33,6 @@ export default function App() {
   const [completed, setCompleted] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
-  /* scatter logic unchanged */
   useLayoutEffect(() => {
     if (!canvasRef.current) return;
     const { width, height } = canvasRef.current.getBoundingClientRect();
@@ -48,7 +46,6 @@ export default function App() {
     setPos(start);
   }, []);
 
-  /* drag-drop logic unchanged */
   const handleDrop = (id, x, y) => {
     setPos((prev) => {
       const next = { ...prev };
@@ -68,12 +65,10 @@ export default function App() {
     });
   };
 
-  // Add navigation handler
   const handleNextPage = () => {
     setCurrentPage(2);
   };
 
-  // Add navigation handler for going back to page 1
   const handlePreviousPage = () => {
     setCurrentPage(1);
   };
@@ -82,25 +77,23 @@ export default function App() {
     <DndProvider backend={HTML5Backend}>
       <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-200 p-6">
         {currentPage === 1 ? (
-          // First page content
           <>
             <h1 className="text-3xl font-bold text-center mb-6">Let's Learn</h1>
 
             {completed ? (
-              /* ───────── 60 % / 40 % split (NO GAP) ───────── */
               <div className="flex h-[80vh]">
-                {/* 3-D panel — flush to the left, fills 60 % */}
                 <div className="flex-[3_3_0] bg-white rounded-l-2xl shadow-xl overflow-hidden">
-                  <ThreeDModel /> {/* canvas already w-full h-full */}
+                  <ThreeDModel />
                 </div>
-          
-                {/* Chatbot panel — fills remaining 40 % */}
                 <div className="flex-[2_2_0] bg-white rounded-r-2xl shadow-xl overflow-hidden">
-                  <ChatBot initialBotMessage={DESCRIPTION} />
+                  <ChatBot
+                    initialBotMessage="Hello! I'm here to help with your PDF."
+                    pdfUrl="/CUPRA_Tavascan_Owners_Manual_11_24_GB.pdf"
+                    apiKey="AIzaSyCsT-4q31krXmM1LAs7ExD9uL7_MtA2ucE"
+                  />
                 </div>
               </div>
             ) : (
-              /* ───────── puzzle board layout (unchanged) ───────── */
               <div className="grid grid-cols-4 gap-6 h-[80vh]">
                 <div
                   ref={canvasRef}
@@ -147,7 +140,6 @@ export default function App() {
               </div>
             )}
 
-            {/* Add a Next button - always visible on page 1 */}
             <div className="flex justify-end mt-4">
               <button
                 onClick={handleNextPage}
@@ -158,7 +150,6 @@ export default function App() {
             </div>
           </>
         ) : (
-          // Use the SecondPage component and pass the navigation handler
           <SecondPage onPreviousPage={handlePreviousPage} />
         )}
       </div>

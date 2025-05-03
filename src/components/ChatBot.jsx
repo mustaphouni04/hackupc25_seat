@@ -1,29 +1,70 @@
 import React, { useEffect, useRef, useState } from "react";
+import { initializeRAG, queryRAG } from './rag.js';
 
-export default function ChatBot({ initialBotMessage }) {
+export default function ChatBot({ initialBotMessage, pdfUrl, apiKey }) {
   const [messages, setMessages] = useState([
     { id: 0, sender: "bot", text: initialBotMessage },
   ]);
   const [input, setInput] = useState("");
+  const [ragSystem, setRagSystem] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const bottomRef = useRef(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const send = () => {
+  useEffect(() => {
+    async function init() {
+      setIsLoading(true);
+      try {
+        const system = await initializeRAG(pdfUrl, apiKey);
+        setRagSystem(system);
+        setMessages((prev) => [
+          ...prev,
+          { id: prev.length, sender: "bot", text: "I'm ready to answer your questions about the document." },
+        ]);
+      } catch (error) {
+        console.error("Error initializing RAG system:", error);
+        setMessages((prev) => [
+          ...prev,
+          { id: prev.length, sender: "bot", text: "Error loading the document: " + error.message },
+        ]);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    init();
+  }, [pdfUrl, apiKey]);
+
+  const send = async () => {
     const text = input.trim();
     if (!text) return;
     setMessages((prev) => [
       ...prev,
       { id: prev.length, sender: "user", text },
-      {
-        id: prev.length + 1,
-        sender: "bot",
-        text: "🤖 (placeholder) Backend reply coming soon!",
-      },
     ]);
     setInput("");
+    if (isLoading || !ragSystem) {
+      setMessages((prev) => [
+        ...prev,
+        { id: prev.length, sender: "bot", text: "Still loading the document, please wait." },
+      ]);
+    } else {
+      try {
+        const response = await queryRAG(ragSystem, text);
+        setMessages((prev) => [
+          ...prev,
+          { id: prev.length, sender: "bot", text: response },
+        ]);
+      } catch (error) {
+        console.error("Error querying RAG system:", error);
+        setMessages((prev) => [
+          ...prev,
+          { id: prev.length, sender: "bot", text: "Error getting response: " + error.message },
+        ]);
+      }
+    }
   };
 
   return (
@@ -57,6 +98,7 @@ export default function ChatBot({ initialBotMessage }) {
         <button
           onClick={send}
           className="bg-blue-600 text-white px-4 text-sm"
+          disabled={isLoading}
         >
           Send
         </button>
