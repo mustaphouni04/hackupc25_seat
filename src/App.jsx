@@ -33,6 +33,11 @@ export default function App() {
   const [completed, setCompleted] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
+  // Debug the API key
+  console.log("API Key available:", import.meta.env.VITE_GEMINI_API_KEY ? 
+    "Yes (length: " + import.meta.env.VITE_GEMINI_API_KEY.length + ")" : 
+    "No");
+
   useLayoutEffect(() => {
     if (!canvasRef.current) return;
     const { width, height } = canvasRef.current.getBoundingClientRect();
@@ -89,7 +94,7 @@ export default function App() {
                   <ChatBot
                     initialBotMessage="Hello! I'm here to help with your PDF."
                     pdfUrl="/CUPRA_Tavascan_Owners_Manual_11_24_GB.pdf"
-                    apiKey="basurita"
+                    apiKey={import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.GEMINI_API_KEY || ''}
                   />
                 </div>
               </div>
