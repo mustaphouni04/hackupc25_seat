@@ -25,3 +25,5 @@ dist-ssr
 parts.txt
 package-lock.json
 3d/*
+data
+videos
