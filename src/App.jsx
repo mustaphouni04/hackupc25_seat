@@ -90,7 +90,7 @@ export default function App() {
                 <div className="flex-[3_3_0] bg-white rounded-l-2xl shadow-xl overflow-hidden">
                   <ThreeDModel />
                 </div>
-                <div className="flex-[2_2_0] bg-white rounded-r-2xl shadow-xl overflow-hidden">
+                <div className="flex-[2_2_0] bg-white rounded-r-2xl shadow-xl overflow-hidden relative">
                   <ChatBot
                     initialBotMessage="Hello! I'm here to help with your PDF."
                     pdfUrl="/CUPRA_Tavascan_Owners_Manual_11_24_GB.pdf"

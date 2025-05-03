@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { initializeRAG, queryRAG } from './rag.js';
+import './ChatBot.css';
 
 export default function ChatBot({ initialBotMessage, pdfUrl, apiKey }) {
   const [messages, setMessages] = useState([
@@ -106,3 +107,4 @@ export default function ChatBot({ initialBotMessage, pdfUrl, apiKey }) {
     </div>
   );
 }
+
