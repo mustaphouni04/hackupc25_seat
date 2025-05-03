@@ -5,6 +5,7 @@ import PuzzlePiece from "./components/PuzzlePiece";
 import DropSlot from "./components/DropSlot";
 import ThreeDModel from "./components/ThreeDModel";
 import ChatBot from "./components/ChatBot";
+import SecondPage from "./components/SecondPage"; // Import the SecondPage component
 import confetti from "canvas-confetti";
 
 /* --- constants identical to your working code --- */
@@ -31,6 +32,7 @@ export default function App() {
   const canvasRef = useRef(null);
   const [pos, setPos] = useState({});
   const [completed, setCompleted] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   /* scatter logic unchanged */
   useLayoutEffect(() => {
@@ -66,70 +68,98 @@ export default function App() {
     });
   };
 
+  // Add navigation handler
+  const handleNextPage = () => {
+    setCurrentPage(2);
+  };
+
+  // Add navigation handler for going back to page 1
+  const handlePreviousPage = () => {
+    setCurrentPage(1);
+  };
+
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-200 p-6">
-        <h1 className="text-3xl font-bold text-center mb-6">Let's Learn</h1>
+        {currentPage === 1 ? (
+          // First page content
+          <>
+            <h1 className="text-3xl font-bold text-center mb-6">Let's Learn</h1>
 
-        {completed ? (
-         /* ───────── 60 %  /  40 %  split (NO GAP) ───────── */
-         <div className="flex h-[80vh]">
-           {/* 3-D panel — flush to the left, fills 60 % */}
-           <div className="flex-[3_3_0] bg-white rounded-l-2xl shadow-xl overflow-hidden">
-             <ThreeDModel /> {/* canvas already w-full h-full */}
-           </div>
-      
-           {/* Chatbot panel — fills remaining 40 % */}
-           <div className="flex-[2_2_0] bg-white rounded-r-2xl shadow-xl overflow-hidden">
-             <ChatBot initialBotMessage={DESCRIPTION} />
-           </div>
-         </div>
-        ) : (
-          /* ───────── puzzle board layout (unchanged) ───────── */
-          <div className="grid grid-cols-4 gap-6 h-[80vh]">
-            <div
-              ref={canvasRef}
-              className="relative col-span-3 bg-white rounded-2xl shadow-xl h-full overflow-hidden"
-            >
-              <>
-                {pieces.map((p) => (
-                  <DropSlot
-                    key={p.id}
-                    index={p.id}
-                    left={targetPositions[p.id].x}
-                    top={targetPositions[p.id].y}
-                    size={PIECE}
-                    onDrop={handleDrop}
-                  />
-                ))}
-                {pieces.map((p) => (
-                  <PuzzlePiece
-                    key={p.id}
-                    id={p.id}
-                    row={p.row}
-                    col={p.col}
-                    position={pos[p.id] || { x: 0, y: 0 }}
-                    size={PIECE}
-                    onDrop={handleDrop}
-                    image={FULL_IMAGE}
-                    totalCols={COLS}
-                    totalRows={ROWS}
-                  />
-                ))}
-              </>
-            </div>
-
-            <div className="bg-white shadow-xl rounded-2xl p-4">
-              <h2 className="text-xl font-semibold mb-2">Reference</h2>
-              <div className="flex items-center justify-center p-2">
-                <img
-                  src={FULL_IMAGE}
-                  alt="reference"
-                  className="w-full max-w-xs max-h-60 object-contain opacity-60 rounded-md shadow"
-                />
+            {completed ? (
+              /* ───────── 60 % / 40 % split (NO GAP) ───────── */
+              <div className="flex h-[80vh]">
+                {/* 3-D panel — flush to the left, fills 60 % */}
+                <div className="flex-[3_3_0] bg-white rounded-l-2xl shadow-xl overflow-hidden">
+                  <ThreeDModel /> {/* canvas already w-full h-full */}
+                </div>
+          
+                {/* Chatbot panel — fills remaining 40 % */}
+                <div className="flex-[2_2_0] bg-white rounded-r-2xl shadow-xl overflow-hidden">
+                  <ChatBot initialBotMessage={DESCRIPTION} />
+                </div>
               </div>
+            ) : (
+              /* ───────── puzzle board layout (unchanged) ───────── */
+              <div className="grid grid-cols-4 gap-6 h-[80vh]">
+                <div
+                  ref={canvasRef}
+                  className="relative col-span-3 bg-white rounded-2xl shadow-xl h-full overflow-hidden"
+                >
+                  <>
+                    {pieces.map((p) => (
+                      <DropSlot
+                        key={p.id}
+                        index={p.id}
+                        left={targetPositions[p.id].x}
+                        top={targetPositions[p.id].y}
+                        size={PIECE}
+                        onDrop={handleDrop}
+                      />
+                    ))}
+                    {pieces.map((p) => (
+                      <PuzzlePiece
+                        key={p.id}
+                        id={p.id}
+                        row={p.row}
+                        col={p.col}
+                        position={pos[p.id] || { x: 0, y: 0 }}
+                        size={PIECE}
+                        onDrop={handleDrop}
+                        image={FULL_IMAGE}
+                        totalCols={COLS}
+                        totalRows={ROWS}
+                      />
+                    ))}
+                  </>
+                </div>
+
+                <div className="bg-white shadow-xl rounded-2xl p-4">
+                  <h2 className="text-xl font-semibold mb-2">Reference</h2>
+                  <div className="flex items-center justify-center p-2">
+                    <img
+                      src={FULL_IMAGE}
+                      alt="reference"
+                      className="w-full max-w-xs max-h-60 object-contain opacity-60 rounded-md shadow"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Add a Next button - always visible on page 1 */}
+            <div className="flex justify-end mt-4">
+              <button
+                onClick={handleNextPage}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300"
+              >
+                Next
+              </button>
             </div>
-          </div>
+          </>
+        ) : (
+          // Use the SecondPage component and pass the navigation handler
+          <SecondPage onPreviousPage={handlePreviousPage} />
         )}
       </div>
     </DndProvider>
