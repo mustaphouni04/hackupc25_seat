@@ -89,7 +89,7 @@ export default function App() {
                   <ChatBot
                     initialBotMessage="Hello! I'm here to help with your PDF."
                     pdfUrl="/CUPRA_Tavascan_Owners_Manual_11_24_GB.pdf"
-                    apiKey="AIzaSyCsT-4q31krXmM1LAs7ExD9uL7_MtA2ucE"
+                    apiKey="basurita"
                   />
                 </div>
               </div>
