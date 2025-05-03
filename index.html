@@ -1,25 +1,58 @@
+<!-- index.html -->
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <title>3-D quick-view</title>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + React</title>
 
-  <!-- Map both "three" and any "three/…" imports -->
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-      "three/": "https://unpkg.com/three@0.160.0/"
-    }
-  }
-  </script>
+    <!-- Load Three.js and Vanta.js -->
+    <script src="/three.min.js"></script>
+    <script src="/vanta.dots.min.js"></script>
 
-  <script type="module" src="main.js"></script>
-  <style>html,body{height:100%;margin:0}</style>
-</head>
-<body>
-  <!-- If you’re using Three.js you can remove this, 
-       or else add the <model-viewer> script above -->
-  <canvas id="c"></canvas>
-</body>
+    <style>
+      #vanta-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1; /* Send to back */
+        pointer-events: none; /* Allow clicks through */
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Vanta background container -->
+    <div id="vanta-bg"></div>
+
+    <!-- React App root -->
+    <div id="root"></div>
+
+    <!-- React App -->
+    <script type="module" src="/src/main.jsx"></script>
+
+    <!-- Initialize Vanta AFTER DOM is loaded -->
+    <script>
+      window.addEventListener("DOMContentLoaded", () => {
+        VANTA.DOTS({
+          el: "#vanta-bg",
+          mouseControls: true,
+          touchControls: true,
+          gyroControls: false,
+          minHeight: 200.0,
+          minWidth: 200.0,
+          scale: 1.0,
+          scaleMobile: 1.0,
+          size: 2.8,
+          spacing: 27.0,
+          showLines: false,
+          color:0x8e44ad,  //purple 0x8e44ad, // 0x8e44ad,
+          color2: 0x8e44ad, //blue 0x3498db, // 0x3498db,
+          backgroundColor: 0xf0f4ff // 0xf0f4ff, 0x000000
+        });
+      });
+    </script>
+  </body>
 </html>
