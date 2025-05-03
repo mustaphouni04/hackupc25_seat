@@ -1,0 +1,137 @@
+import React, { useLayoutEffect, useRef, useState } from "react";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import PuzzlePiece from "./components/PuzzlePiece";
+import DropSlot from "./components/DropSlot";
+import ThreeDModel from "./components/ThreeDModel";
+import ChatBot from "./components/ChatBot";
+import confetti from "canvas-confetti";
+
+/* --- constants identical to your working code --- */
+const COLS = 3, ROWS = 2, PIECE = 100, GAP = 10;
+const OFFSET_X = 100, OFFSET_Y = 100;
+const FULL_IMAGE = "/images/full-image.jfif";
+const DESCRIPTION =
+  "Steering wheel → Adjust the steering wheel using the lever in the lower-left side of the steering column.";
+
+const pieces = Array.from({ length: COLS * ROWS }, (_, i) => ({
+  id: i.toString(),
+  row: Math.floor(i / COLS),
+  col: i % COLS,
+}));
+const targetPositions = pieces.reduce((acc, p) => {
+  acc[p.id] = {
+    x: OFFSET_X + p.col * (PIECE + GAP),
+    y: OFFSET_Y + p.row * (PIECE + GAP),
+  };
+  return acc;
+}, {});
+
+export default function App() {
+  const canvasRef = useRef(null);
+  const [pos, setPos] = useState({});
+  const [completed, setCompleted] = useState(false);
+
+  /* scatter logic unchanged */
+  useLayoutEffect(() => {
+    if (!canvasRef.current) return;
+    const { width, height } = canvasRef.current.getBoundingClientRect();
+    const start = {};
+    pieces.forEach((p) => {
+      start[p.id] = {
+        x: Math.random() * (width - PIECE),
+        y: Math.random() * (height - PIECE),
+      };
+    });
+    setPos(start);
+  }, []);
+
+  /* drag-drop logic unchanged */
+  const handleDrop = (id, x, y) => {
+    setPos((prev) => {
+      const next = { ...prev };
+      const tgt = targetPositions[id];
+      next[id] = Math.hypot(x - tgt.x, y - tgt.y) < 40 ? tgt : { x, y };
+      const done = pieces.every((p) =>
+        Math.hypot(
+          (next[p.id].x ?? 0) - targetPositions[p.id].x,
+          (next[p.id].y ?? 0) - targetPositions[p.id].y
+        ) < 10
+      );
+      if (done && !completed) {
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+        setCompleted(true);
+      }
+      return next;
+    });
+  };
+
+  return (
+    <DndProvider backend={HTML5Backend}>
+      <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-200 p-6">
+        <h1 className="text-3xl font-bold text-center mb-6">Let's Learn</h1>
+
+        {completed ? (
+         /* ───────── 60 %  /  40 %  split (NO GAP) ───────── */
+         <div className="flex h-[80vh]">
+           {/* 3-D panel — flush to the left, fills 60 % */}
+           <div className="flex-[3_3_0] bg-white rounded-l-2xl shadow-xl overflow-hidden">
+             <ThreeDModel /> {/* canvas already w-full h-full */}
+           </div>
+      
+           {/* Chatbot panel — fills remaining 40 % */}
+           <div className="flex-[2_2_0] bg-white rounded-r-2xl shadow-xl overflow-hidden">
+             <ChatBot initialBotMessage={DESCRIPTION} />
+           </div>
+         </div>
+        ) : (
+          /* ───────── puzzle board layout (unchanged) ───────── */
+          <div className="grid grid-cols-4 gap-6 h-[80vh]">
+            <div
+              ref={canvasRef}
+              className="relative col-span-3 bg-white rounded-2xl shadow-xl h-full overflow-hidden"
+            >
+              <>
+                {pieces.map((p) => (
+                  <DropSlot
+                    key={p.id}
+                    index={p.id}
+                    left={targetPositions[p.id].x}
+                    top={targetPositions[p.id].y}
+                    size={PIECE}
+                    onDrop={handleDrop}
+                  />
+                ))}
+                {pieces.map((p) => (
+                  <PuzzlePiece
+                    key={p.id}
+                    id={p.id}
+                    row={p.row}
+                    col={p.col}
+                    position={pos[p.id] || { x: 0, y: 0 }}
+                    size={PIECE}
+                    onDrop={handleDrop}
+                    image={FULL_IMAGE}
+                    totalCols={COLS}
+                    totalRows={ROWS}
+                  />
+                ))}
+              </>
+            </div>
+
+            <div className="bg-white shadow-xl rounded-2xl p-4">
+              <h2 className="text-xl font-semibold mb-2">Reference</h2>
+              <div className="flex items-center justify-center p-2">
+                <img
+                  src={FULL_IMAGE}
+                  alt="reference"
+                  className="w-full max-w-xs max-h-60 object-contain opacity-60 rounded-md shadow"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </DndProvider>
+  );
+}
