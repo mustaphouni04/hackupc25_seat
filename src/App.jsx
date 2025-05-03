@@ -4,9 +4,10 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import PuzzlePiece from "./components/PuzzlePiece";
 import DropSlot from "./components/DropSlot";
-import ThreeDModel from "./components/ThreeDModel";
 import SecondPage from "./components/SecondPage";
 import confetti from "canvas-confetti";
+import ThreeDModel from "./components/ThreeDModel";
+import MyChatbot from "./components/Chatbot";
 
 const COLS = 3;
 const ROWS = 2;
@@ -37,6 +38,11 @@ export default function App() {
   const [pos, setPos] = useState({});
   const [completed, setCompleted] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Debug the API key
+  console.log("API Key available:", import.meta.env.VITE_GEMINI_API_KEY ? 
+    "Yes (length: " + import.meta.env.VITE_GEMINI_API_KEY.length + ")" : 
+    "No");
 
   // scatter pieces randomly once we measure the canvas
   useLayoutEffect(() => {
@@ -110,16 +116,25 @@ export default function App() {
               </div>
             </div>
 
-            {/* Puzzle and Reference Section */}
-            <div className="grid grid-cols-5 gap-6 h-[70vh]">
-              {/* Puzzle Canvas */}
-              <div
-                ref={canvasRef}
-                className="relative col-span-3 bg-white rounded-2xl shadow-xl h-full overflow-hidden"
-              >
-                {completed ? (
+            {completed ? (
+              <div className="flex h-[70vh] gap-6">
+                <div className="flex-[3_3_0] bg-white rounded-l-2xl shadow-xl overflow-hidden">
                   <ThreeDModel modelPath="/models/full.glb"/>
-                ) : (
+                </div>
+                <div className="flex-[2_2_0] bg-white rounded-r-2xl shadow-xl overflow-hidden">
+                  <div className="h-full">
+                    <MyChatbot />
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* Puzzle and Reference Section */
+              <div className="grid grid-cols-5 gap-6 h-[70vh]">
+                {/* Puzzle Canvas */}
+                <div
+                  ref={canvasRef}
+                  className="relative col-span-3 bg-white rounded-2xl shadow-xl h-full overflow-hidden"
+                >
                   <>
                     {pieces.map((p) => (
                       <DropSlot
@@ -147,21 +162,11 @@ export default function App() {
                       />
                     ))}
                   </>
-                )}
-              </div>
+                </div>
 
-              {/* Reference Panel */}
-              <div className="col-span-2 bg-white shadow-xl rounded-2xl p-4 overflow-auto">
-              {!completed && (
-                <h2 className="text-xl font-semibold mb-2">Final Image</h2>
-              )}
-                {completed ? (
-                  <div className="text-gray-700 text-sm">
-                    🎉 Puzzle completed!<br />
-                    Steering wheel → Adjust using the lever in the lower-left side of
-                    the steering column.
-                  </div>
-                ) : (
+                {/* Reference Panel */}
+                <div className="col-span-2 bg-white shadow-xl rounded-2xl p-4 overflow-auto">
+                  <h2 className="text-xl font-semibold mb-2">Final Image</h2>
                   <div className="flex items-center justify-center p-1">
                     <img
                       src={FULL_IMAGE}
@@ -169,9 +174,9 @@ export default function App() {
                       className="w-[500px] h-[350px] object-contain opacity-100 rounded-md shadow-md"
                     />
                   </div>
-                )}
+                </div>
               </div>
-            </div>
+            )}
             
             <div className="flex justify-end mt-4">
               <button
