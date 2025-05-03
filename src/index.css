@@ -78,3 +78,9 @@ button:focus-visible {
   z-index: -1;        /* behind React */
   pointer-events: none;
 }
+
+/* Force chatbot width */
+.react-chatbot-kit-chat-container {
+	width: 100% !important;
+	max-width: 100% !important;
+  }

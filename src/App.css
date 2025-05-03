@@ -40,3 +40,9 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Force chatbot width */
+.react-chatbot-kit-chat-container {
+	width: 100% !important;
+	max-width: 100% !important;
+  }
