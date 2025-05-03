@@ -9,10 +9,9 @@ import {
 } from "@react-three/drei";
 import * as THREE from "three";
 
-useGLTF.preload("/models/car.glb");
-
-function CarModel() {
-  const gltf = useGLTF("/models/car.glb");
+// 👇 CarModel component accepts a modelPath prop
+function CarModel({ modelPath, position  }) {
+  const gltf = useGLTF(modelPath);
   const ref = useRef();
 
   useEffect(() => {
@@ -22,7 +21,6 @@ function CarModel() {
           child.castShadow = true;
           child.receiveShadow = true;
 
-          // Optional: force MeshStandardMaterial for better lighting response
           if (!(child.material instanceof THREE.MeshStandardMaterial)) {
             child.material = new THREE.MeshStandardMaterial({
               color: child.material.color || "white",
@@ -39,38 +37,47 @@ function CarModel() {
     <primitive
       ref={ref}
       object={gltf.scene}
-      scale={1.5}
-      position={[0, -0.75, 0]}
+      scale={1.0}
+      position={position} // {[0, -0.75, 0]}
     />
   );
 }
 
-export default function ThreeDModel() {
+// 👇 ThreeDModel accepts props (modelPath, width, height)
+export default function ThreeDModel({
+  modelPath = "/models/car.glb",
+  width = 550,
+  height = 340,
+  position = [0, -0.75, 0], 
+}) {
+  useEffect(() => {
+    useGLTF.preload(modelPath);
+  }, [modelPath]);
+
   return (
-    <div className="w-[500px] h-[350px] rounded-xl overflow-hidden shadow-xl ml-auto mr-4">
+    <div
+      className="rounded-xl overflow-hidden shadow-xl mx-auto"
+      style={{ width, height }}
+    >
       <Canvas
         shadows
         dpr={[1, 2]}
-        camera={{ position: [2, 2, 5], fov: 45 }}
+        camera={{ position: [2, 2, 5], fov: 45 }} // [2, 2, 5], fov: 45 }}
         style={{ width: "100%", height: "100%" }}
       >
         <color attach="background" args={["#f0f0f0"]} />
-
         <ambientLight intensity={0.5} />
-
         <directionalLight
           castShadow
           intensity={1.5}
-          position={[5, 10, 5]}
+          position={[5, 10, 5]} // {[5, 10, 5]}
           shadow-mapSize-width={1024}
           shadow-mapSize-height={1024}
         />
-
         <Suspense fallback={<Html center>Loading...</Html>}>
           <Environment preset="warehouse" background />
-          <CarModel />
+          <CarModel modelPath={modelPath} position={position}/>
         </Suspense>
-
         <ContactShadows
           position={[0, -0.8, 0]}
           opacity={0.4}
@@ -78,14 +85,8 @@ export default function ThreeDModel() {
           blur={2}
           far={1.2}
         />
-
         <OrbitControls />
       </Canvas>
     </div>
   );
 }
-
-
-
-
-
