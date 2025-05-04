@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Quiz Challenge</title>
+<style>
+/* ---------- variables & reset ---------- */
+:root{
+  --brand-from:#6366f1;          /* indigo-500 */
+  --brand-mid :#c026d3;          /* fuchsia-600 */
+  --brand-to  :#ec4899;          /* pink-500   */
+  --radius: 1.25rem;
+  font-family: system-ui, sans-serif;
+  line-height: 1.45;
+  margin:0;padding:0;
+}
+*,*:before,*:after{box-sizing:border-box}
+body{
+  display:flex;justify-content:center;align-items:center;
+  min-height:100vh;
+  background:radial-gradient(circle at center,
+    #fff 0%,#eef 50%,#e9d5ff 100%);
+  padding:1rem;
+}
+
+/* ---------- layout ---------- */
+.card{
+  width:420px;
+  background:rgba(255,255,255,.9);
+  backdrop-filter:blur(6px);
+  border-radius:var(--radius);
+  box-shadow:0 10px 25px rgba(0,0,0,.15);
+  padding:2rem;
+}
+
+/* ---------- progress bar ---------- */
+.progress{
+  position:relative;
+  height:20px;margin:1.5rem 0;
+  background:rgba(255,255,255,.7);
+  border-radius:9999px;
+  overflow:hidden;
+}
+.progress-bar{
+  height:100%;width:0%;
+  background:linear-gradient(90deg,
+     var(--brand-from),var(--brand-mid),var(--brand-to));
+  transition:width .3s ease;
+}
+.progress span{
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:600;color:#fff;
+}
+
+/* ---------- pills ---------- */
+.pill{
+  width:100%;display:flex;align-items:center;gap:.6rem;
+  padding:1rem 1.25rem;margin:.5rem 0;
+  border:2px solid #e5e7eb;border-radius:9999px;
+  background:#fff;cursor:pointer;transition:.15s;
+}
+.pill:hover{border-color:var(--brand-mid);transform:scale(1.02)}
+.pill[data-selected="true"]{
+  border-color:var(--brand-mid) !important;
+  background:#faf5ff;                   /* fuchsia-50 */
+  box-shadow:0 4px 12px rgba(0,0,0,.07);
+}
+.badge{
+  width:28px;height:28px;flex:none;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:50%;background:#e5e7eb;
+  font-size:13px;font-weight:600;color:#374151;
+}
+.pill[data-selected="true"] .badge{
+  background:var(--brand-mid);color:#fff;
+}
+
+/* ---------- buttons ---------- */
+button.action{
+  width:100%;margin-top:1.5rem;padding:.85rem 1rem;
+  font-weight:600;font-size:15px;color:#fff;
+  border:none;border-radius:12px;cursor:pointer;
+  background:linear-gradient(90deg,
+     var(--brand-from),var(--brand-mid),var(--brand-to));
+}
+button.action:hover{opacity:.9}
+
+/* result list */
+.resultRow{border:1px solid transparent;padding:.5rem .75rem;
+  margin:.25rem 0;border-radius:8px;display:flex;align-items:center;gap:.6rem}
+.resultRow.right{background:#ecfdf5;border-color:#34d399}
+.resultRow.wrong{background:#fef2f2;border-color:#f87171}
+.resultRow .badge{width:22px;height:22px;font-size:11px}
+
+small.note{display:block;margin-top:1rem;color:#6b7280;text-align:center;font-size:13px}
+
+/* utility centre header */
+h1{margin:0;text-align:center;font-size:32px;
+    background:linear-gradient(90deg,var(--brand-from),var(--brand-to));
+    -webkit-background-clip:text;color:transparent;font-weight:800;}
+</style>
+</head>
+<body>
+
+<div class="card" id="app">
+  <!-- content gets injected by JS -->
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<script>
+/* ---------- data ---------- */
+const questions = [
+  {
+    question: "What powers a modern electric vehicle (EV)?",
+    options: ["Gasoline", "Diesel", "Electricity", "Steam"],
+    answer: 2,
+    selectedOption: null
+  },
+  {
+    question: "Which of the following places would you most likely go to recharge an electric vehicle?",
+    options: ["A bus station", "A car wash", "A charging station", "A mechanic shop"],
+    answer: 2,
+    selectedOption: null
+  },
+  {
+    question: "Which is usually quieter while driving?",
+    options: ["Electric vehicle", "Gasoline vehicle", "Diesel truck", "Motorcycle"],
+    answer: 0,
+    selectedOption: null
+  }
+];
+
+/* ---------- state ---------- */
+let idx   = 0;
+let score = 0;
+
+/* ---------- helpers ---------- */
+const $ = (sel, el=document) => el.querySelector(sel);
+
+function render(){
+  const root = $('#app');
+  root.innerHTML = '';                            // clear
+  const total    = questions.length;
+  const q        = questions[idx];
+  const progress = Math.round((idx/total)*100);
+
+  // title
+  root.insertAdjacentHTML('beforeend', `<h1>Quiz Challenge</h1>
+    <div class="progress">
+      <div class="progress-bar" style="width:${progress}%"></div>
+      <span>${progress}%</span>
+    </div>`);
+
+  /* QUIZ MODE */
+  if(idx < total){
+    const section = document.createElement('section');
+    section.innerHTML = `
+      <p style="font-size:14px;color:#4b5563">Question ${idx+1} / ${total}</p>
+      <h2 style="font-size:20px;margin:.5rem 0 1.5rem">${q.question}</h2>
+      <div id="optBox"></div>
+      <button class="action" id="nextBtn">${idx===total-1?'Finish Quiz':'Next'}</button>`;
+    root.append(section);
+
+    // create pills
+    q.options.forEach((opt,i)=>{
+      const pill = document.createElement('div');
+      pill.className='pill';
+      pill.dataset.index=i;
+      pill.innerHTML=`<span class="badge">${String.fromCharCode(65+i)}</span><span>${opt}</span>`;
+      pill.onclick=()=>{q.selectedOption=i; render();}
+      if(q.selectedOption===i) pill.dataset.selected=true;
+      $('#optBox',section).append(pill);
+    });
+
+    $('#nextBtn',section).onclick=()=>{
+      if(q.selectedOption==null){alert('Select an option');return}
+      if(q.selectedOption===q.answer) score++;
+      idx++;
+      if(idx===total){confetti({particleCount:150,spread:70,origin:{y:.6}});}
+      render();
+    };
+  }
+  /* RESULT MODE */
+  else{
+    root.insertAdjacentHTML('beforeend',`
+      <h2 style="text-align:center;font-size:24px;color:#4f46e5;margin-bottom:1rem">
+        You scored <strong>${score}</strong> / ${total}</h2>
+      <div id="review"></div>
+      <small class="note">Refresh the page to try again 🔄</small>`);
+    const list = $('#review');
+    questions.forEach((q,qi)=>{
+      q.options.forEach((o,oi)=>{
+        const row = document.createElement('div');
+        row.className='resultRow '+
+          (oi===q.answer?'right':oi===q.selectedOption?'wrong':'');
+        row.innerHTML=`<span class="badge">${String.fromCharCode(65+oi)}</span>
+           <span style="flex:1">${o}</span>`;
+        list.append(row);
+      });
+    });
+  }
+}
+
+render();
+</script>
+</body>
+</html>
