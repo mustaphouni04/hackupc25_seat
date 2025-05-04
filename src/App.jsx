@@ -5,6 +5,7 @@ import { HTML5Backend } from "react-dnd-html5-backend";
 import PuzzlePiece from "./components/PuzzlePiece";
 import DropSlot from "./components/DropSlot";
 import SecondPage from "./components/SecondPage";
+import ThirdPage from "./components/ThirdPage";
 import confetti from "canvas-confetti";
 import ThreeDModel from "./components/ThreeDModel";
 import MyChatbot from "./components/Chatbot";
@@ -34,10 +35,10 @@ const targetPositions = pieces.reduce((acc, p) => {
 }, {});
 
 export default function App() {
-  const canvasRef = useRef(null);
-  const [pos, setPos] = useState({});
-  const [completed, setCompleted] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
+	const canvasRef = useRef(null);
+	const [pos, setPos] = useState({});
+	const [completed, setCompleted] = useState(false);
+	const [currentPage, setCurrentPage] = useState(1);
 
   // Debug the API key
   console.log("API Key available:", import.meta.env.VITE_GEMINI_API_KEY ? 
@@ -89,11 +90,11 @@ export default function App() {
   };
 
   const handleNextPage = () => {
-    setCurrentPage(2);
+    setCurrentPage(prev => prev + 1);
   };
 
   const handlePreviousPage = () => {
-    setCurrentPage(1);
+    setCurrentPage(prev => prev - 1);
   };
 
   return (
@@ -187,9 +188,14 @@ export default function App() {
               </button>
             </div>
           </>
-        ) : (
-          <SecondPage onPreviousPage={handlePreviousPage} />
-        )}
+        ) : currentPage === 2 ? (
+			<SecondPage 
+			  onPreviousPage={() => setCurrentPage(1)} 
+			  onNextPage={() => setCurrentPage(3)}
+			/>
+		  ) : (
+			<ThirdPage onPreviousPage={() => setCurrentPage(2)} />
+		  )}
       </div>
     </DndProvider>
   );

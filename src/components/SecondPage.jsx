@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 
-const SecondPage = ({ onPreviousPage }) => {
+const SecondPage = ({ onPreviousPage, onNextPage }) => {
   const videoRef = useRef(null);
   const progressRef = useRef(null);
   const [videoTime, setVideoTime] = useState(0);
@@ -354,14 +354,20 @@ const SecondPage = ({ onPreviousPage }) => {
           </div>
           
           {/* Back button container */}
-          <div className="w-full mt-auto pt-2">
-            <button
-              onClick={onPreviousPage}
-              className="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-1.5 px-4 rounded-lg shadow-md transition-duration-300 text-sm"
-            >
-              Back
-            </button>
-          </div>
+          <div className="flex justify-between mt-4">
+			<button
+			onClick={onPreviousPage}
+			className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300"
+			>
+			Previous
+			</button>
+			<button
+			onClick={onNextPage}
+			className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300"
+			>
+			Next
+			</button>
+		</div>
         </div>
       </div>
     </div>
