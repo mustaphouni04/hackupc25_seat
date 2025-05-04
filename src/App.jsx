@@ -41,9 +41,9 @@ const modelListFullCompleted = [
 ];
 
 const descriptionList = [
-  "Steering Wheel",
-  "Front Seats",
-  "Charger",
+  "Adjust the steering wheel using the lever in the lower left side of the steering column.",
+  "Pull the lever to move the seat forwards or backwards. Lift the handle to move the seat cushion forwards or backwards.",
+  "You can charge the high-voltage battery with AC or with DC, altough a higher charging power is achieved with DC than when charging with AC.",
 ];
 
 
@@ -138,7 +138,7 @@ export default function App() {
             {/* header + top-right preview */}
             <div className="grid grid-cols-5 gap-6 items-start">
               <div className="col-span-3 flex justify-center">
-                <h1 className="text-3xl font-bold">Let&apos;s Learn</h1>
+                <h1 className="text-3xl font-bold">CUPRA Pitstop</h1>
               </div>
               <div className="col-span-2 justify-self-end">
                 <div className="bg-white rounded-2xl shadow-xl overflow-hidden w-[450px] h-[200px]">
