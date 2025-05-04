@@ -29,3 +29,5 @@ data
 videos
 .env
 *.glb
+*.jpeg
+*.jfif

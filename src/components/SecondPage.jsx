@@ -214,7 +214,7 @@ const SecondPage = ({ onPreviousPage, onNextPage }) => {
 
   return (
     <div className="h-screen flex flex-col bg-gradient-to-br from-blue-100 to-purple-200 p-4 overflow-hidden">
-      <h1 className="text-2xl font-bold text-center mb-2">Parking Assistance</h1>
+      <h1 className="text-[30px] font-bold text-center mb-2">Parking Assistance</h1>
       
       {/* Main container - takes all available space without causing scroll */}
       <div className="flex flex-1 overflow-hidden">

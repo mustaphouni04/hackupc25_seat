@@ -5,9 +5,10 @@ import "react-chatbot-kit/build/main.css";
 import config from "../chatbot/config";
 import ActionProvider from "../chatbot/ActionProvider";
 import MessageParser from "../chatbot/MessageParser";
+import { createChatBotMessage } from "react-chatbot-kit";
 import { initializeRAG, queryRAG } from './rag.js';
 
-export default function MyChatbot() {
+export default function MyChatbot({ intro }) {
   const [ragSystem, setRagSystem] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -114,31 +115,18 @@ export default function MyChatbot() {
         config={{
           ...config,
           initialMessages: [
-            {
-              widget: "loading",
-              loading: true,
-              withAvatar: true,
-            },
-            {
-              message: "Hello! I'm your CUPRA assistant. I'm ready to answer questions about your CUPRA Tavascan.",
-              withAvatar: true,
-            }
-          ],
-          customComponents: {
-            header: () => (
-              <div style={{ backgroundColor: "#3b82f6", color: "white", padding: "10px", fontWeight: "bold" }}>
-                CUPRA Assistant
-              </div>
+            // must be BotMessage instances:
+            createChatBotMessage(
+              "Hello! I'm your CUPRA assistant. I'm ready to answer questions about your CUPRA Tavascan."
             ),
-          },
-          widgets: [
-            {
-              widgetName: "loading",
-              widgetFunc: () => <div>Loading document, please wait...</div>,
-              mapStateToProps: ["loading"],
-            },
+            // only add the description if intro is truthy
+            ...(intro
+              ? [createChatBotMessage(intro)]
+              : []
+            ),
           ],
         }}
+
         messageParser={CustomMessageParser}
         actionProvider={CustomActionProvider}
       />
