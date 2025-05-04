@@ -2,6 +2,21 @@
 
 ![image](github_image.jpeg)
 
+## How to use
+Put your 3D models at: `public/models/`  
+Put your videos at: `videos/`  
+Put your video quizzes at: `data/videoQuizzes.json`
+
+Install the dependencies:
+```
+npm i
+```
+Run the app:
+```
+npm run dev
+```
+Access the app at `http://localhost:5173/`
+
 ## Inspiration
 We noticed that many drivers including our own parents often ignore the driver’s manual and struggle to adapt to the advanced features of modern vehicles. Today’s cars, like the Cupra Tavascan, are far more complex than older models. When we saw this challenge from Cupra, we knew it was the perfect opportunity to build something that bridges this knowledge gap in a user friendly, engaging way.
 
